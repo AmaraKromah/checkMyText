@@ -1,0 +1,33 @@
+ if (enddate.isBetween(today, today.clone().add(4, 'd'))) {
+                    var user_id = parseInt("{{request.user.id}}");
+                    console.log("ik kom hier");
+                    console.log(user_id, checker.id);
+                    if (user_id === checker.id) {
+                        warning_html += "Eigennaar: " + owner.first_name + " " + owner.last_name + "<br>" +
+                            "Checker: " + checker.first_name + " " + checker.last_name + "<br>" +
+                            "Bestand: " + result.name + "<br>" +
+                            "<strong> verloopt: " + upper_first(today.clone().subtract(0, 'd').to(enddate)) +
+                            " op " + enddate.format("D/M/YYYY") + "<br><br>";
+                        warning_html += '<a href=' + "../projects/" + result.id + ' >details</a>';
+//                      warning_html += '<a href='+"{% url 'all_projects' %}"+result.id+' >details</a>';
+                        $("#warning_project").html(warning_html);
+                    } else {
+                        console.log("ik kom hier 2");
+                        $("#warning_project").html("Geen bestanden");
+                    }
+                } else {
+                    $("#warning_project").html("Geen bestanden");
+                }
+
+
+_____________________________________________________________________________________
+   {% if user.is_authenticated and not user.is_superuser %}
+
+
+
+   _________________________________________
+       {{ user_form.as_p }}
+   ---------------------------
+   {{ profile_form.as_p }}
+    {{ student_details_form.as_p }}
+    {{ company_details_form.as_p }}

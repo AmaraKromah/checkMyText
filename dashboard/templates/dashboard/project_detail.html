@@ -1,0 +1,94 @@
+{% extends "dashboard/index.html" %}
+
+{% block title %} {{userfile.name}} {% endblock %}
+
+{%block content %}
+
+
+<h1> Project</h1>
+
+<ul>
+
+    <input type="hidden" id="project_id" value="{{userfile.id}}">
+
+    Eigennaar: {{userfile.get_owner_full_name}}<br>
+    Bestandsnaam: {{userfile.name}}<br>
+    Thema: {{userfile.thema}}<br>
+    Aantal woorden: {{userfile.word_count}}<br><br>
+    Upload datum: {{userfile.upload_date}}<br>
+    Accept datum: {{userfile.accept_date}}<br><br>
+    Eind datum: {{userfile.end_date|date:"l d M Y"}}<br>
+    Eind tijd: {{userfile.end_date|date:"H:i:s"}}<br><br>
+    Prijs: {{userfile.price}}<br>
+    <p> Checker: <span id="checker_id">{{userfile.get_checker_full_name}}</span></p>
+    {% if not userfile.checker %}
+    <form onsubmit="return false">
+        {% csrf_token %}
+        <button id="confirm" onclick="ConfirmProject()">Bevestigen</button>
+    </form>
+    {% endif %}
+    <p id="cancel_time"></p>
+
+
+    <br>
+</ul>
+
+<a href="#" onclick="goBack();return false;">Terug</a>
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+    function goBack() {
+        location.replace(document.referrer);
+    }
+    function ConfirmProject() {
+        var checker = $("#checker_id").text();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'confirm_project' %}",
+            dataType: "json",
+            async: true,
+            data: {
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                project_id: parseInt($('#project_id').val())
+            },
+            success: function (json) {
+                if (json.result === "no checker") {
+                    $("#checker_id").text(json.data);
+                    $("#confirm").remove();
+                }
+            }
+        });
+    }
+    function time_to_cancel() {
+        var year = moment().year();
+        var month = moment().month() + 1;
+        var day = moment().date();
+
+        var today = moment(new Date(year, month, day));
+        var deadline = today.add(86400000, 'ms');
+
+        function cancel_timer() {
+            deadline.subtract(1, 's');
+            console.clear();
+            console.log(deadline.format('H:mm:ss'));
+            $("#cancel_time").html("time to cancel " + deadline.format('H:mm:ss'))
+        }
+
+        cancel_timer();
+        setInterval(cancel_timer, 1000);
+    }
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+

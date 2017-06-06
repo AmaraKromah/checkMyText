@@ -1,0 +1,116 @@
+{% extends "dashboard/index.html" %}
+
+{% block title %}Running projects{% endblock %}
+
+
+{%block content %}
+<h1> Lijst van alle projecten </h1>
+
+<h3>Projecten dat deadline naderen</h3>
+<ul id="warning_project">
+</ul>
+
+<h3>Lopende projecten</h3>
+<ul id="active_project">
+</ul>
+
+
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
+<p><a href="{% url 'master:base' %}">home</a></p>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+
+    //    ajax vertraging animatie implementeren
+    function ajax_dates() {
+        $.ajax({
+            url: "{% url 'get_files_dates' %}",
+            type: "GET"
+
+        }).done(function (object) {
+            date_calculation(object.dates, object.users);
+        });
+    }
+    function date_calculation(result_date, result_user) {
+
+        function upper_first(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        auto_update();
+        function auto_update() {
+            var warning_html = "";
+            var active_html = "";
+            var today = moment();
+            $.each(result_date, function (index, result) {
+
+                var enddate = moment(result.end_date);
+                console.log(enddate);
+                var owner = $.grep(result_user, function (v) {
+                    return v.id === result.owner_id;
+                })[0];
+
+                var checker = $.grep(result_user, function (v) {
+
+                    return v.id === result.checker_id;
+                })[0];
+
+//           Projecten met een waarschuwing
+                if (enddate.isBetween(today, today.clone().add(4, 'd'))) {
+
+                    warning_html += "Eigennaar: " + owner.first_name + " " + owner.last_name + "<br>";
+                    if (typeof(checker) === 'undefined') {
+                        warning_html += "Checker: None <br>";
+                    } else {
+                        warning_html += "Checker: " + checker.first_name + " " + checker.last_name + "<br>";
+                    }
+                    warning_html += "Bestand: " + result.name + "<br>" +
+                        "<strong> verloopt: " + upper_first(today.clone().subtract(0, 'd').to(enddate)) +
+                        " op " + enddate.format("D/M/YYYY") + " om "+enddate.format("HH:mm:ss")+"</strong><br>";
+//                    warning_html += '<a  onclick="testing('+result.id+')">details</a><br><br>'
+//                    warning_html += '<a href=' + "../projects/" + result.id + ' >details</a><br><br>';
+                      warning_html += '<a href='+"{% url 'all_projects' %}"+result.id+' >details</a><br><br>';
+
+                    $("#warning_project").html(warning_html);
+                } else {
+                    $("#warning_project").html("Geen bestanden");
+                }
+
+
+//            Lopende projecten
+                if (enddate > (today.clone().add(4, 'd'))) {
+
+                    active_html += "Eigennaar: " + owner.first_name + " " + owner.last_name + "<br>";
+                    console.log(typeof(checker));
+                    if (typeof(checker) === 'undefined') {
+
+                        active_html += "Checker: None <br>";
+                    } else {
+                        active_html += "Checker: " + checker.first_name + " " + checker.last_name + "<br>";
+                    }
+                    active_html += "Bestand: " + result.name + "<br>" +
+                        "Nog lopend tot: <strong>" + enddate.format("D/M/YYYY") + "</strong><br>";
+
+                    active_html += '<a href='+"{% url 'all_projects' %}"+result.id+' >details</a><br><br>';
+//                    active_html += '<a href=' + "../projects/" + result.id + ' >details</a><br><br>';
+                    $("#active_project").html(active_html);
+                }
+
+            });
+
+        }
+
+//        setInterval(auto_update, 1000);
+    }
+    ajax_dates();
+
+    function testing(id) {
+      window.location ="{% url 'all_projects' %}" +id
+//      window.location ="../projects/" +id
+         console.log("ID",id)
+    }
+</script>
+{% endblock %}
+

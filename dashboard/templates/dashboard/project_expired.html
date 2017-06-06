@@ -1,0 +1,30 @@
+{% extends "dashboard/index.html" %}
+
+{% block title %}expired projects{% endblock %}
+
+{%block content %}
+
+<h1> Verlopen projecten </h1>
+    <ul>
+        {%for project in expired_projects %}
+
+            Eigenaar: {{ project.get_owner_full_name }}<br>
+            Checker: {{ project.get_checker_full_name }}<br>
+            Bestandsnaam:{{ project.name }}<br>
+            Eind datum: {{project.end_date|date:"l d M Y"}}<br>
+            Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
+            <a href="{% url 'all_projects' %}{{project.id}}">details</a>
+            <br><br>
+
+        {% endfor %}
+    </ul>
+
+
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
+<p><a href="{% url 'master:base' %}">home</a></p>
+{% endblock %}
+
+
+{% block javascript %}
+<script></script>
+{% endblock %}

@@ -1,0 +1,27 @@
+<title>Profile</title>
+<h1> Profile</h1>
+<h3> Welcome</h3>
+    <p> type: {{user.userprofile.user_type.name}}</p>
+    <p> voornaam: {{user.first_name}}</p>
+    <p> achternaam: {{user.last_name}}</p>
+    <p> gebruikersnaam: {{user.username}}</p>
+    <p> email: {{user.email}}</p>
+    <p> geslacht: {{user.userprofile.sex}}</p>
+    <p> geboortedatum: {{user.userprofile.birth_date}}</p>
+    <p> verbonden door: {{user.userprofile.hook_up}}</p>
+    <p> betalingswijze: {{user.userprofile.payment}}</p>
+    <p> status: {{user.userprofile.status}}</p>
+{%if user.userprofile.status == "student"%}
+    <p> school: {{user.studentdetails.school}}</p>
+    <p> opleiding: {{user.studentdetails.education}}</p>
+{%elif  user.userprofile.status == "bedrijf" %}
+    <p> ondernemingsnummer: {{user.companydetails.business_number}}</p>
+    <p> sector: {{user.companydetails.sector}}</p>
+    <p> voorkeur: {{user.companydetails.preference}}</p>
+{%endif%}
+
+<p><a href="{% url 'edit_profile' %}">bewerk uw gegevens</a></p>
+<p><a href="{% url 'change_password' %}">wijzig wachtwoord</a></p>
+<p><a href="{% url 'logout' %}">uitloggen</a></p>
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
+<p><a href="{% url 'master:base' %}">home</a></p>

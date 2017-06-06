@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--suppress XmlInvalidId -->
+<html>
+<head>
+    <title>Register</title>
+</head>
+
+<body>
+<h1>Register with Django</h1>
+CheckMyText says: <strong>register here!</strong><br/>
+
+<form id="user_form" method="post" action=" " enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.non_field_errors }}
+    <div class="fieldWrapper">
+        <p>
+            {{ user_form.first_name.errors }}
+            <label for="{{ user_form.first_name.id_for_label }}">First name:</label>
+            {{ user_form.first_name }}</p>
+        <p>
+            {{ user_form.last_name.errors }}
+            <label for="{{ user_form.last_name.id_for_label }}">Last name:</label>
+            {{ user_form.last_name }}</p>
+        <p>
+            {{ user_form.username.errors }}
+            <label for="{{ user_form.username.id_for_label }}">Username:</label>
+            {{ user_form.username }} </p>
+        <p>
+            {{ user_form.email.errors }}
+            <label for="{{ user_form.email.id_for_label }}">Email:</label>
+            {{ user_form.email }} </p>
+        <p>
+            {{ user_form.sex.errors }}
+            <label for="{{ user_form.sex.id_for_label }}">Sex:</label>
+            {{ user_form.sex }} </p>
+        <P>
+            {{ user_form.birth_date.errors }}
+            <label for="{{ user_form.birth_date.id_for_label }}">Birthday:</label>
+            {{ user_form.birth_date }} </P>
+        <P>
+            {{ user_form.hook_up.errors }}
+            <label for="{{ user_form.hook_up.id_for_label }}">Hook up:</label>
+            {{ user_form.hook_up }} </P>
+        <P>
+            {{ user_form.payment.errors }}
+            <label for="{{ user_form.payment.id_for_label }}">Payment:</label>
+            {{ user_form.payment }}</P>
+        <P>
+            {{ user_form.status.errors }}
+            <label for="{{ user_form.status.id_for_label }}">Status:</label>
+            {{ user_form.status }}</P>
+    </div>
+    <div id="student_wrapper" class="fieldWrapper">
+        <p>
+            {{ user_form.school.errors }}
+            <label for="{{ user_form.school.id_for_label }}">School:</label>
+            {{ user_form.school }}</p>
+        <p>
+            {{ user_form.education.errors }}
+            <label for="{{ user_form.education.id_for_label }}">Education:</label>
+            {{ user_form.education }}</p>
+    </div>
+    <div id="company_wrapper" class="fieldWrapper">
+        <p>
+            {{ user_form.business_number.errors }}
+            <label for="{{ user_form.business_number.id_for_label }}">Business number:</label>
+            {{ user_form.business_number }}</p>
+        <p>
+            {{ user_form.sector.errors }}
+            <label for="{{ user_form.sector.id_for_label }}">Sector:</label>
+            {{ user_form.sector }}</p>
+        <p>
+            {{ user_form.preference.errors }}
+            <label for="{{ user_form.preference.id_for_label }}">Preference:</label>
+            {{ user_form.preference }}</p>
+    </div>
+    <div class="fieldWrapper">
+        <p>
+            {{ user_form.password.errors }}
+            <label for="{{ user_form.password.id_for_label }}">Password:</label>
+            {{ user_form.password }}</p>
+        <p>
+            {{ user_form.confirm_password.errors }}
+            <label for="{{ user_form.confirm_password.id_for_label }}">Confirm password:</label>
+            {{ user_form.confirm_password }}</p>
+    </div>
+
+
+    <input type="submit" name="submit" value="Register"/>
+</form>
+<p><a href="{% url 'master:base' %}">home</a></p>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var status = $("#id_status");
+        on_load_status();
+        after_load_status();
+
+        function on_load_status() {
+            var status_value = status.find(":selected").text().toLowerCase();
+            if (status_value === "student") {
+                $("#company_wrapper").hide();
+                $("#student_wrapper").show();
+            }
+            if (status_value === "bedrijf") {
+
+                $("#student_wrapper").hide();
+                $("#company_wrapper").show();
+            }
+            if (status_value === "algemeen gebruiker") {
+                $("#student_wrapper,#company_wrapper").hide();
+
+            }
+        }
+        function after_load_status() {
+            status.change(function () {
+                var status_value = status.find(":selected").text().toLowerCase();
+                if (status_value === "student") {
+                    $("#company_wrapper").hide();
+                    $("#student_wrapper").show();
+                }
+                if (status_value === "bedrijf") {
+
+                    $("#student_wrapper").hide();
+                    $("#company_wrapper").show();
+                }
+                if (status_value === "algemeen gebruiker") {
+                    $("#student_wrapper,#company_wrapper").hide();
+
+                }
+            });
+        }
+
+    });
+
+
+</script>
+</body>
+</html>

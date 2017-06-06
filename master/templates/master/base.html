@@ -1,0 +1,18 @@
+
+<h1> Master index</h1>
+
+<ul>
+    {% if user.is_authenticated  %}
+         <li><a href="{% url 'profile' %}">profiel</a></li>
+         <li><a href="{% url 'dashboard' %}">dashboard</a></li>
+         <li><a href="{% url 'logout' %}">logout</a></li>
+    {% else %}
+         <li><a href="{% url 'login' %}">login</a></li>
+         <li><a href="{% url 'pre_register' %}">Registreer</a></li>
+    </ul>
+    <p>Welcome, Please register or log in.</p>
+{% endif %}
+
+
+
+

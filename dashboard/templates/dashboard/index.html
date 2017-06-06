@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="nl-be">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+</head>
+<body>
+
+<h1> Dashboard </h1>
+<h3> Welcome {{user.first_name}} {{ user.last_name}}</h3>
+<ul>
+    <li><a href="{% url 'profile' %}">profiel</a></li>
+    <li><a href="{% url 'logout' %}">logout</a></li>
+</ul>
+
+
+{% block content %}
+<ul>
+    {% if request.user.userprofile.user_type.name == "checker" %}
+        <li><a href="{% url 'all_projects' %}">Alle projecten</a></li>
+        <li><a href="{% url 'running_projects' %}">Lopende projecten</a></li>
+    {% else %}
+        <li><a href="{% url 'all_projects' %}">Mijn projecten</a></li>
+    {% endif %}
+    <li><a href="{% url 'project_history' %}">Verlopen projecten</a></li>
+</ul>
+{% endblock %}
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/locale/nl-be.js"></script>
+{% block javascript %}{% endblock %}
+
+</body>
+</html>

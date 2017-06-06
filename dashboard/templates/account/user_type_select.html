@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html>
+<head>
+    <title>Usertype</title>
+</head>
+
+<body>
+<h1>Select what type of user you are </h1>
+
+
+<br>
+<form action="" method="post">
+    {% csrf_token %}
+   <input type="hidden" name="texter">
+    <input type="submit" value="texter">
+</form>
+
+<form action="" method="post">
+    {% csrf_token %}
+   <input type="hidden" name="checker">
+    <input type="submit" value="checker">
+</form>
+
+<p><a href="{% url 'master:base' %}">home</a></p>
+</body>
+</html>
