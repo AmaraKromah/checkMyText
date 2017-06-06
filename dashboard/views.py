@@ -532,6 +532,8 @@ class confirmProjectView(View):
             raise Http404
 
 
+import moment
+
 
 class ProjectCreateView(View):
     @staticmethod
@@ -541,17 +543,32 @@ class ProjectCreateView(View):
             name = files_form.cleaned_data.get('name')
             theme = files_form.cleaned_data.get('thema')
             end_date = files_form.cleaned_data.get('end_date')
-            # upload_date = moment.now()
             owner = request.user
+            upload_date = moment.utcnow().timezone('Europe/Brussels')
+            checker_end_date = moment.date(end_date)
+            delta_deadline = (checker_end_date - upload_date).days
+            # word_count = 100
             word_count = randint(10, 1000)
             price_word = 0.3
-            price = word_count * price_word
-            #
-            # print("owner: ", owner.first_name, owner.last_name, "\nname", name, "\ntheme", theme,
-            #       "\nword count", word_count, "\nend_date", end_date, "\nprice", price, "\n")
+            price = None
 
+            if delta_deadline < 3:
+                print("\nDIT IS DRINGEND, U BETAALD 150%", delta_deadline)
+                price = word_count * price_word * 1.50
+                print("prijs zonder verhoging", word_count * price_word, "\nprijs met verhoging", price)
 
+            elif 3 <= delta_deadline <= 7:
+                print("\nDIT IS NIET ZO DRINGEND, U BETAALD 130%", delta_deadline)
+                price = word_count * price_word * 1.30
+                print("prijs zonder verhoging", word_count * price_word, "\nprijs met verhoging", price)
 
+            else:
+                price = word_count * price_word
+                print("\nDIT IS NIET  DRINGEND, U BETAALD DE GEWONE PRIJS%", delta_deadline)
+
+            print("\nowner: ", owner.first_name, owner.last_name, "\nname", name, "\ntheme", theme,
+                  "\nword count", word_count, "\nupload date", upload_date.strftime("%d/%m/%Y %H:%M:%S"), "\nend date", end_date.strftime("%d/%m/%Y %H:%M:%S"), "\nprice",
+                  price, "\n")
 
         return render(request, 'dashboard/project_new.html', {'files_form': files_form})
 

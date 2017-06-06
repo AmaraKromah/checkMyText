@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^projects/running$', views.ProjectRunningView.as_view(), name='running_projects'),
     url(r'^projects/expired$', views.ProjectExpiredView.as_view(), name='project_history'),
     url(r'^projects/(?P<pk>[0-9]+)$', views.ProjectDetailView.as_view(), name='project_detail'),
-    url(r'^project/new$', views.ProjectCreateView.as_view(), name='all_projects'),
+    url(r'^project/new$', views.ProjectCreateView.as_view(), name='new_project'),
 
     # __________________________________________________________________________________________________________
 
