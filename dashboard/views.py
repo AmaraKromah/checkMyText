@@ -2,7 +2,9 @@ from __future__ import print_function
 
 import datetime
 import warnings
+from random import randint
 
+import moment
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.tokens import default_token_generator
@@ -29,7 +31,6 @@ from .forms import (
     CreateUserFileForm
 )
 from .models import User, StudentDetails, CompanyDetails, UserProfile, UserType, UserFile
-from random import randint
 
 
 # ---------------hierboven is niet van mij----------------------------
@@ -522,9 +523,11 @@ class confirmProjectView(View):
 
         if project.checker is None:
             project.checker = request.user
+            project.accept_date = datetime.datetime.now()
             project.save()
             response_data['result'] = "no checker"
-            response_data['data'] = user_name
+            response_data['checker'] = user_name
+            response_data['accept_date'] = project.accept_date
 
         if request.is_ajax():
             return JsonResponse(response_data)
@@ -532,47 +535,54 @@ class confirmProjectView(View):
             raise Http404
 
 
-import moment
-
-
 class ProjectCreateView(View):
     @staticmethod
     def post(request):
         files_form = CreateUserFileForm(data=request.POST)
+
         if files_form.is_valid():
             name = files_form.cleaned_data.get('name')
-            theme = files_form.cleaned_data.get('thema')
+            thema = files_form.cleaned_data.get('thema')
             end_date = files_form.cleaned_data.get('end_date')
             owner = request.user
-            upload_date = moment.utcnow().timezone('Europe/Brussels')
+            now = datetime.datetime.now()
+            upload_date = moment.utcnow().timezone('Europe/Brussels')  # same as today but used for calculations
             checker_end_date = moment.date(end_date)
             delta_deadline = (checker_end_date - upload_date).days
             # word_count = 100
             word_count = randint(10, 1000)
             price_word = 0.3
-            price = None
 
             if delta_deadline < 3:
-                print("\nDIT IS DRINGEND, U BETAALD 150%", delta_deadline)
                 price = word_count * price_word * 1.50
-                print("prijs zonder verhoging", word_count * price_word, "\nprijs met verhoging", price)
-
             elif 3 <= delta_deadline <= 7:
-                print("\nDIT IS NIET ZO DRINGEND, U BETAALD 130%", delta_deadline)
                 price = word_count * price_word * 1.30
-                print("prijs zonder verhoging", word_count * price_word, "\nprijs met verhoging", price)
-
             else:
                 price = word_count * price_word
-                print("\nDIT IS NIET  DRINGEND, U BETAALD DE GEWONE PRIJS%", delta_deadline)
 
-            print("\nowner: ", owner.first_name, owner.last_name, "\nname", name, "\ntheme", theme,
-                  "\nword count", word_count, "\nupload date", upload_date.strftime("%d/%m/%Y %H:%M:%S"), "\nend date", end_date.strftime("%d/%m/%Y %H:%M:%S"), "\nprice",
+            print("\nowner:", owner.first_name, owner.last_name, "\nname:", name, "\ntheme:", thema,
+                  "\nword count:", word_count, "\nupload date:", upload_date.strftime("%d/%m/%Y %H:%M:%S"),
+                  "\nend date:", end_date.strftime("%d/%m/%Y %H:%M:%S"), "\nprice",
                   price, "\n")
 
+            if not UserFile.objects.filter(name=name).exists():
+                UserFile.objects.create(owner=owner, name=name, thema=thema, word_count=word_count, upload_date=now,
+                                        end_date=end_date, price=price)
+                return redirect('dashboard')
+            else:
+                # vervang dit later door ajax
+                return render(request, 'dashboard/project_new.html', {'files_form': files_form,
+                                                                      'bestaat': 'deze opdracht bestaat al reeds'
+                                                                      })
         return render(request, 'dashboard/project_new.html', {'files_form': files_form})
 
     @staticmethod
     def get(request):
-        files_form = CreateUserFileForm()
-        return render(request, 'dashboard/project_new.html', {'files_form': files_form})
+        if request.user.is_authenticated():
+            if request.user.userprofile.user_type.name == "texter":
+                files_form = CreateUserFileForm()
+                return render(request, 'dashboard/project_new.html', {'files_form': files_form})
+            else:
+                return redirect('dashboard')
+        else:
+            return redirect('login')

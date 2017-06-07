@@ -16,17 +16,20 @@
     Thema: {{userfile.thema}}<br>
     Aantal woorden: {{userfile.word_count}}<br><br>
     Upload datum: {{userfile.upload_date}}<br>
-    Accept datum: {{userfile.accept_date}}<br><br>
+    Accept datum: <span id="accept_date">{{userfile.accept_date|default_if_none:"None"}}</span> <br><br>
+
     Eind datum: {{userfile.end_date|date:"l d M Y"}}<br>
     Eind tijd: {{userfile.end_date|date:"H:i:s"}}<br><br>
     Prijs: {{userfile.price}}<br>
     <p> Checker: <span id="checker_id">{{userfile.get_checker_full_name}}</span></p>
-    {% if not userfile.checker %}
-    <form onsubmit="return false">
-        {% csrf_token %}
-        <button id="confirm" onclick="ConfirmProject()">Bevestigen</button>
-    </form>
-    {% endif %}
+    {% if request.user.userprofile.user_type.name == "checker" %}
+        {% if not userfile.checker %}
+        <form onsubmit="return false">
+            {% csrf_token %}
+            <button id="confirm" onclick="ConfirmProject()">Bevestigen</button>
+        </form>
+        {% endif %}
+     {% endif %}
     <p id="cancel_time"></p>
 
 
@@ -57,30 +60,32 @@
             },
             success: function (json) {
                 if (json.result === "no checker") {
-                    $("#checker_id").text(json.data);
+                    $("#checker_id").text(json.checker);
+                    var accept_date = moment(json.accept_date).format("D MMMM YYYY HH:mm:ss")
+                    $("#accept_date").text(accept_date);
                     $("#confirm").remove();
                 }
             }
         });
     }
-    function time_to_cancel() {
-        var year = moment().year();
-        var month = moment().month() + 1;
-        var day = moment().date();
-
-        var today = moment(new Date(year, month, day));
-        var deadline = today.add(86400000, 'ms');
-
-        function cancel_timer() {
-            deadline.subtract(1, 's');
-            console.clear();
-            console.log(deadline.format('H:mm:ss'));
-            $("#cancel_time").html("time to cancel " + deadline.format('H:mm:ss'))
-        }
-
-        cancel_timer();
-        setInterval(cancel_timer, 1000);
-    }
+//    function time_to_cancel() {
+//        var year = moment().year();
+//        var month = moment().month() + 1;
+//        var day = moment().date();
+//
+//        var today = moment(new Date(year, month, day));
+//        var deadline = today.add(86400000, 'ms');
+//
+//        function cancel_timer() {
+//            deadline.subtract(1, 's');
+//            console.clear();
+//            console.log(deadline.format('H:mm:ss'));
+//            $("#cancel_time").html("time to cancel " + deadline.format('H:mm:ss'))
+//        }
+//
+//        cancel_timer();
+//        setInterval(cancel_timer, 1000);
+//    }
 </script>
 {% endblock %}
 

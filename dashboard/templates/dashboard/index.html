@@ -20,6 +20,7 @@
         <li><a href="{% url 'all_projects' %}">Alle projecten</a></li>
         <li><a href="{% url 'running_projects' %}">Lopende projecten</a></li>
     {% else %}
+        <li><a href="{% url 'new_project' %}">Crieër nieuwe project</a></li>
         <li><a href="{% url 'all_projects' %}">Mijn projecten</a></li>
     {% endif %}
     <li><a href="{% url 'project_history' %}">Verlopen projecten</a></li>

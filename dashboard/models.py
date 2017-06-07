@@ -115,7 +115,7 @@ class UserFile(models.Model):
     thema = models.CharField(max_length=65, blank=True)
     word_count = models.IntegerField(blank=True)
     upload_date = models.DateTimeField(blank=False)
-    accept_date = models.DateTimeField(blank=True)
+    accept_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=False)
     checker = models.ForeignKey(User, related_name="user_checker", on_delete=models.SET_NULL, null=True, blank=True)
     price = models.FloatField(blank=True)
