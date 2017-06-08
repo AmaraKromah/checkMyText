@@ -31,3 +31,9 @@ ________________________________________________________________________________
    {{ profile_form.as_p }}
     {{ student_details_form.as_p }}
     {{ company_details_form.as_p }}
+
+_____________________________________________________________________________________________________
+            print("\nowner:", owner.first_name, owner.last_name, "\nname:", name, "\ntheme:", thema,
+                  "\nword count:", word_count, "\nupload date:", upload_date.strftime("%d/%m/%Y %H:%M:%S"),
+                  "\nend date:", end_date.strftime("%d/%m/%Y %H:%M:%S"), "\nprice",
+                  price, "\n")

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import djcelery
+
 djcelery.setup_loader()
 
 # CELERY BROKER SETTINGS
@@ -22,15 +23,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Brussels'
 
-
-
 # BROKER_URL = 'django://'  # verander naar redis of RabbitMQ wanneer je life gaat
 # CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -42,7 +40,6 @@ SECRET_KEY = 'ei(3fz7%z-k_oh=p(z9*=gs-ahb%5u^&a@k0at9j371somit0m'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # EMAIL SETTINGS FOR G-MAIL
 # EMAIL_USE_TLS = True
@@ -89,13 +86,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'checkMyText.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -106,7 +103,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -125,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -146,5 +141,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-EMAIL_HOST = 'localhost'        # verander dit naar een echte email service wanneer je live gaat
+EMAIL_HOST = 'localhost'  # verander dit naar een echte email service wanneer je live gaat
 EMAIL_PORT = 1025
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 decimal = RegexValidator(r'^[0-9]+(\.[0-9]{1,5})?$', 'Enkel decimalen toegelaten bv. 0.1')
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Enkel alphanumerische waarden toegtelaten bv. abc123  .')
@@ -113,12 +115,13 @@ class UserFile(models.Model):
     owner = models.ForeignKey(User, related_name="user_texter", on_delete=models.CASCADE)
     name = models.CharField(max_length=65, blank=True)
     thema = models.CharField(max_length=65, blank=True)
-    word_count = models.IntegerField(blank=True)
+    word_count = models.IntegerField(blank=True, null=True)
     upload_date = models.DateTimeField(blank=False)
     accept_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=False)
     checker = models.ForeignKey(User, related_name="user_checker", on_delete=models.SET_NULL, null=True, blank=True)
-    price = models.FloatField(blank=True)
+    price = models.FloatField(blank=True, null=True)
+    file = models.FileField(blank=True)
 
     def get_owner_full_name(self):
         return self.owner.first_name + " " + self.owner.last_name
@@ -131,7 +134,14 @@ class UserFile(models.Model):
 
     def __str__(self):
         if self.checker is None:
-            return "owner: " + str(self.owner.first_name) + ' name: ' + str(self.name) + ' checker: None '
+            return "owner: " + str(self.owner.first_name) + ' name: ' + str(self.name) + \
+                   ' checker: None ' + ' File: ' + str(self.file)
         else:
             return "owner: " + str(self.owner.first_name) + ' name: ' + str(self.name) + ' checker: ' + str(
-                self.checker.first_name)
+                self.checker.first_name) + ' File: ' + str(self.file)
+
+
+# om de bestand te verwijderen als het opdracht verwijderd word
+@receiver(pre_delete, sender=UserFile)
+def delete( instance, **kwargs):
+    instance.file.delete(False)

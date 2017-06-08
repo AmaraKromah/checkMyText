@@ -9,8 +9,7 @@
 <br><br>
 
 
-<form id="user_form" method="post" action=" "
-      enctype="multipart/form-data">
+<form enctype="multipart/form-data" id="user_form" method="post" action=" ">
     {{bestaat}}
     {% csrf_token %}
     {{ files_form.as_p }}

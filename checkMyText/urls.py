@@ -15,10 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
-app_name = 'master'
+# app_name = 'master'
 urlpatterns = [
     url(r'^', include('master.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
     url(r'^admin/', admin.site.urls),
 ]
+
+# Omdat wij in debug werken. Pas dit aan wanneer je in productie gaat werken
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root= settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

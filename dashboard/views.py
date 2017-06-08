@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import datetime
 import warnings
-from random import randint
 
 import moment
 from django.contrib import messages
@@ -15,6 +14,7 @@ from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render, redirect, resolve_url
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.http import urlsafe_base64_decode
 from django.views import generic
@@ -523,7 +523,8 @@ class confirmProjectView(View):
 
         if project.checker is None:
             project.checker = request.user
-            project.accept_date = datetime.datetime.now()
+            # project.accept_date = datetime.datetime.now()
+            project.accept_date = timezone.now()
             project.save()
             response_data['result'] = "no checker"
             response_data['checker'] = user_name
@@ -538,42 +539,41 @@ class confirmProjectView(View):
 class ProjectCreateView(View):
     @staticmethod
     def post(request):
-        files_form = CreateUserFileForm(data=request.POST)
+        files_form = CreateUserFileForm(data=request.POST, files=request.FILES)
 
         if files_form.is_valid():
             name = files_form.cleaned_data.get('name')
             thema = files_form.cleaned_data.get('thema')
             end_date = files_form.cleaned_data.get('end_date')
             owner = request.user
-            now = datetime.datetime.now()
+            # now = datetime.datetime.now()
+            now = timezone.now()
             upload_date = moment.utcnow().timezone('Europe/Brussels')  # same as today but used for calculations
             checker_end_date = moment.date(end_date)
             delta_deadline = (checker_end_date - upload_date).days
-            # word_count = 100
-            word_count = randint(10, 1000)
             price_word = 0.3
-
-            if delta_deadline < 3:
-                price = word_count * price_word * 1.50
-            elif 3 <= delta_deadline <= 7:
-                price = word_count * price_word * 1.30
-            else:
-                price = word_count * price_word
-
-            print("\nowner:", owner.first_name, owner.last_name, "\nname:", name, "\ntheme:", thema,
-                  "\nword count:", word_count, "\nupload date:", upload_date.strftime("%d/%m/%Y %H:%M:%S"),
-                  "\nend date:", end_date.strftime("%d/%m/%Y %H:%M:%S"), "\nprice",
-                  price, "\n")
+            project_file = files_form.cleaned_data.get('file')
 
             if not UserFile.objects.filter(name=name).exists():
-                UserFile.objects.create(owner=owner, name=name, thema=thema, word_count=word_count, upload_date=now,
-                                        end_date=end_date, price=price)
+                project = UserFile.objects.create(owner=owner, name=name, thema=thema, upload_date=now,
+                                                  end_date=end_date, file=project_file)
+
+                word_count = HelperFunctions.get_word_count(project.file.path)
+                if delta_deadline < 3:
+                    price = word_count * price_word * 1.50
+                elif 3 <= delta_deadline <= 7:
+                    price = word_count * price_word * 1.30
+                else:
+                    price = word_count * price_word
+
+                project.word_count = word_count
+                project.price = price
+                project.save()
                 return redirect('dashboard')
-            else:
-                # vervang dit later door ajax
-                return render(request, 'dashboard/project_new.html', {'files_form': files_form,
-                                                                      'bestaat': 'deze opdracht bestaat al reeds'
-                                                                      })
+            # vervang dit later door ajax
+            return render(request, 'dashboard/project_new.html', {'files_form': files_form,
+                                                                  'bestaat': 'deze opdracht bestaat al reeds'
+                                                                  })
         return render(request, 'dashboard/project_new.html', {'files_form': files_form})
 
     @staticmethod
@@ -586,3 +586,18 @@ class ProjectCreateView(View):
                 return redirect('dashboard')
         else:
             return redirect('login')
+
+
+class HelperFunctions:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_word_count(path):
+        project_file = open(str(path), 'r')
+        num_words = 0
+        for line in project_file:
+            words = line.split()
+            print(words)
+            num_words += len(words)
+        return num_words

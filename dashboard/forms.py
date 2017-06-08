@@ -487,4 +487,4 @@ class CreateUserFileForm(forms.ModelForm):
     # nog validatieprocess starten
     class Meta:
         model = UserFile
-        fields = ('name', 'thema', 'end_date')
+        fields = ('name', 'thema','file', 'end_date')

@@ -21,6 +21,8 @@
     Eind datum: {{userfile.end_date|date:"l d M Y"}}<br>
     Eind tijd: {{userfile.end_date|date:"H:i:s"}}<br><br>
     Prijs: {{userfile.price}}<br>
+    File: <a href="{{userfile.file.url}}">{{userfile.file}}</a><br>
+
     <p> Checker: <span id="checker_id">{{userfile.get_checker_full_name}}</span></p>
     {% if request.user.userprofile.user_type.name == "checker" %}
         {% if not userfile.checker %}
