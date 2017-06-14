@@ -1,7 +1,8 @@
 from __future__ import print_function
 
-import datetime
+import math
 import warnings
+import textract
 
 import moment
 from django.contrib import messages
@@ -465,7 +466,7 @@ class ProjectExpiredView(generic.ListView):
             return redirect('login')
 
     def get_queryset(self):
-        today = datetime.datetime.today()
+        today = timezone.now()
         if self.request.user.userprofile.user_type.name == "checker":
             return UserFile.objects.filter(Q(checker_id=self.request.user.id), Q(end_date__lt=today)).order_by(
                 'end_date')
@@ -483,6 +484,30 @@ class ProjectDetailView(generic.DetailView):
             return super(ProjectDetailView, self).dispatch(request, *args, **kwargs)
         else:
             return redirect('login')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDetailView, self).get_context_data(**kwargs)
+        project = UserFile.objects.get(id__iexact=self.kwargs['pk'])
+        path = project.file.path
+        helper = HelperFunctions(path)
+        whole_word = ""
+        sentence_count = helper.get_sentence_count()
+        sentence_sample_count = int(math.ceil(sentence_count * 0.35))
+
+        sample_data = str(textract.process(path)).split(".")
+        sample_count = 0
+        for word in sample_data:
+            if sample_count >= sentence_sample_count:
+                break
+            else:
+                if word == "":
+                    whole_word += "\n"
+                else:
+                    whole_word += word + "."
+            sample_count += 1
+        context['sample'] = whole_word
+
+        return context
 
 
 # AJAX CALLS
@@ -523,7 +548,6 @@ class confirmProjectView(View):
 
         if project.checker is None:
             project.checker = request.user
-            # project.accept_date = datetime.datetime.now()
             project.accept_date = timezone.now()
             project.save()
             response_data['result'] = "no checker"
@@ -546,7 +570,6 @@ class ProjectCreateView(View):
             thema = files_form.cleaned_data.get('thema')
             end_date = files_form.cleaned_data.get('end_date')
             owner = request.user
-            # now = datetime.datetime.now()
             now = timezone.now()
             upload_date = moment.utcnow().timezone('Europe/Brussels')  # same as today but used for calculations
             checker_end_date = moment.date(end_date)
@@ -557,8 +580,10 @@ class ProjectCreateView(View):
             if not UserFile.objects.filter(name=name).exists():
                 project = UserFile.objects.create(owner=owner, name=name, thema=thema, upload_date=now,
                                                   end_date=end_date, file=project_file)
+                path = project.file.path
+                helper = HelperFunctions(path)
+                word_count = helper.get_word_count()
 
-                word_count = HelperFunctions.get_word_count(project.file.path)
                 if delta_deadline < 3:
                     price = word_count * price_word * 1.50
                 elif 3 <= delta_deadline <= 7:
@@ -572,8 +597,9 @@ class ProjectCreateView(View):
                 return redirect('dashboard')
             # vervang dit later door ajax
             return render(request, 'dashboard/project_new.html', {'files_form': files_form,
-                                                                  'bestaat': 'deze opdracht bestaat al reeds'
+                                                                  'bestaat': 'deze opdracht bestaat al reeds',
                                                                   })
+
         return render(request, 'dashboard/project_new.html', {'files_form': files_form})
 
     @staticmethod
@@ -589,15 +615,15 @@ class ProjectCreateView(View):
 
 
 class HelperFunctions:
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
 
-    @staticmethod
-    def get_word_count(path):
-        project_file = open(str(path), 'r')
-        num_words = 0
-        for line in project_file:
-            words = line.split()
-            print(words)
-            num_words += len(words)
+    def get_word_count(self):
+        project_file = textract.process(self.path).split()
+        num_words = len(project_file)
         return num_words
+
+    def get_sentence_count(self):
+        project_file = str(textract.process(self.path)).split(".")
+        sentence_count = len(project_file)
+        return sentence_count

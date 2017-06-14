@@ -8,9 +8,7 @@
 <h1> Project</h1>
 
 <ul>
-
     <input type="hidden" id="project_id" value="{{userfile.id}}">
-
     Eigennaar: {{userfile.get_owner_full_name}}<br>
     Bestandsnaam: {{userfile.name}}<br>
     Thema: {{userfile.thema}}<br>
@@ -22,6 +20,7 @@
     Eind tijd: {{userfile.end_date|date:"H:i:s"}}<br><br>
     Prijs: {{userfile.price}}<br>
     File: <a href="{{userfile.file.url}}">{{userfile.file}}</a><br>
+    sample:{{sample|linebreaks}}<br>
 
     <p> Checker: <span id="checker_id">{{userfile.get_checker_full_name}}</span></p>
     {% if request.user.userprofile.user_type.name == "checker" %}
