@@ -41,3 +41,16 @@ ________________________________________________________________________________
 
 _______________________________________________________________________________________________________________
             # print(w.lstrip(' '))
+
+
+
+                     {% if messages %}
+                {% for message in messages %}
+                 <p {% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+
+                model = UserFile
+    success_url = reverse_lazy('all_projects')
+

@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import math
 import warnings
-import textract
 
 import moment
+import textract
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.tokens import default_token_generator
@@ -14,7 +14,7 @@ from django.db.models.query import EmptyResultSet
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render, redirect, resolve_url
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.http import urlsafe_base64_decode
@@ -421,7 +421,6 @@ class ProjectIndexView(generic.ListView):
     context_object_name = "all_projects"
 
     def dispatch(self, request, *args, **kwargs):  # onze request parameter opvangen
-        # check if there is some video onsite
         if request.user.is_authenticated():
             return super(ProjectIndexView, self).dispatch(request, *args, **kwargs)
         else:
@@ -441,7 +440,6 @@ class ProjectRunningView(generic.ListView):
 
     def dispatch(self, request, *args, **kwargs):
         # check if there is some video onsite
-        # print("AHAHAHA",self.request.user.userprofile.user_type.name )
         if request.user.is_authenticated():
             if request.user.userprofile.user_type.name == "checker":
                 return super(ProjectRunningView, self).dispatch(request, *args, **kwargs)
@@ -479,7 +477,6 @@ class ProjectDetailView(generic.DetailView):
     template_name = 'dashboard/project_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # check if there is some video onsite
         if request.user.is_authenticated():
             return super(ProjectDetailView, self).dispatch(request, *args, **kwargs)
         else:
@@ -605,11 +602,11 @@ class ProjectCreateView(View):
     @staticmethod
     def get(request):
         if request.user.is_authenticated():
-            if request.user.userprofile.user_type.name == "texter":
-                files_form = CreateUserFileForm()
-                return render(request, 'dashboard/project_new.html', {'files_form': files_form})
-            else:
-                return redirect('dashboard')
+            # if request.user.userprofile.user_type.name == "texter":
+            files_form = CreateUserFileForm()
+            return render(request, 'dashboard/project_new.html', {'files_form': files_form})
+            # else:
+            #     return redirect('dashboard')
         else:
             return redirect('login')
 
@@ -627,3 +624,8 @@ class HelperFunctions:
         project_file = str(textract.process(self.path)).split(".")
         sentence_count = len(project_file)
         return sentence_count
+
+
+class ProjectDeleteView(generic.DeleteView):
+    model = UserFile
+    success_url = reverse_lazy('all_projects')

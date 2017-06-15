@@ -21,11 +21,14 @@
         <li><a href="{% url 'running_projects' %}">Lopende projecten</a></li>
     {% else %}
         <li><a href="{% url 'all_projects' %}">Mijn projecten</a></li>
-        <li><a href="{% url 'new_project' %}">Crieër nieuwe project</a></li>
     {% endif %}
     <li><a href="{% url 'project_history' %}">Verlopen projecten</a></li>
+    <li><a href="{% url 'new_project' %}">Crieër nieuwe project</a></li>
 </ul>
+<p><a href="{% url 'master:base' %}">home</a></p>
 {% endblock %}
+
+
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

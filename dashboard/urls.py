@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^projects/expired$', views.ProjectExpiredView.as_view(), name='project_history'),
     url(r'^projects/(?P<pk>[0-9]+)$', views.ProjectDetailView.as_view(), name='project_detail'),
     url(r'^project/new$', views.ProjectCreateView.as_view(), name='new_project'),
+    url(r'^project/(?P<pk>[0-9]+)/delete$', views.ProjectDeleteView.as_view(), name='delete_project'),
 
     # __________________________________________________________________________________________________________
 

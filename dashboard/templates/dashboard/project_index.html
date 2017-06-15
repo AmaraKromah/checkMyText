@@ -4,19 +4,43 @@
 
 {%block content %}
 
-{{test}}
+<!--check of dit beter in de view kan -->
 <h1> Alle projecten </h1>
     <ul>
         {%for project in all_projects %}
-
-            Eigenaar: {{ project.get_owner_full_name }}<br>
-            Checker: {{ project.get_checker_full_name}}<br>
-            Bestandsnaam:{{ project.name }}<br>
-            Eind datum: {{project.end_date|date:"l d M Y"}}<br>
-            Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
-            <a href="{% url 'all_projects' %}{{project.id}}">details</a>
-            <br><br>
-        
+            {% if project.checker is None %}
+                {% if user.userprofile.user_type.name == "texter" %}
+                    Eigenaar: {{ project.get_owner_full_name }}<br>
+                    Checker: {{ project.get_checker_full_name}}<br>
+                    Bestandsnaam:{{ project.name }}<br>
+                    Eind datum: {{project.end_date|date:"l d M Y"}}<br>
+                    Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
+                    <a href="{% url 'all_projects' %}{{project.id}}">details</a><br>
+                    <form action="{% url 'delete_project' pk=project.id %}" method="post">
+                        {% csrf_token %}
+                      <input type="submit" value="Verwijderen" />
+                    </form>
+                    <br>
+                {% endif %}
+            {% else %}
+                {% if user.userprofile.user_type.name == "texter" %}
+                    Eigenaar: {{ project.get_owner_full_name }}<br>
+                    Checker: {{ project.get_checker_full_name}}<br>
+                    Bestandsnaam:{{ project.name }}<br>
+                    Eind datum: {{project.end_date|date:"l d M Y"}}<br>
+                    Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
+                    <a href="{% url 'all_projects' %}{{project.id}}">details</a><br>
+                    Kan niet verwijderd worden.<br>
+                {% else %}
+                    Eigenaar: {{ project.get_owner_full_name }}<br>
+                    Checker: {{ project.get_checker_full_name}}<br>
+                    Bestandsnaam:{{ project.name }}<br>
+                    Eind datum: {{project.end_date|date:"l d M Y"}}<br>
+                    Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
+                    <a href="{% url 'all_projects' %}{{project.id}}">details</a><br>
+                {% endif %}
+            {% endif %}
+            <br>
         {% endfor %}
     </ul>
 
