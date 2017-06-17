@@ -538,7 +538,7 @@ class confirmProjectView(View):
     def post(request):
         project_id = request.POST.get('project_id', None)
         project = UserFile.objects.get(id__iexact=project_id)
-
+        print(project.file.name, project.file.url)
         # try catch voorzien hier
         user_name = request.user.first_name + " " + request.user.last_name
         response_data = {}
@@ -550,6 +550,8 @@ class confirmProjectView(View):
             response_data['result'] = "no checker"
             response_data['checker'] = user_name
             response_data['accept_date'] = project.accept_date
+            response_data['file_name'] = project.file.name
+            response_data['file_url'] = project.file.url
 
         if request.is_ajax():
             return JsonResponse(response_data)
