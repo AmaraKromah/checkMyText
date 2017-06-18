@@ -529,13 +529,7 @@ class ProjectCreateView(View):
                 path = project.file.path
                 helper = HelperFunctions(path)
                 word_count = helper.get_word_count()
-
-                if delta_deadline < 3:
-                    price = word_count * price_word * 1.50
-                elif 3 <= delta_deadline <= 7:
-                    price = word_count * price_word * 1.30
-                else:
-                    price = word_count * price_word
+                price = helper.calculate_price(delta_deadline, word_count)
 
                 project.word_count = word_count
                 project.price = price
@@ -598,8 +592,10 @@ class getFilesDatesView(View):
 
 class confirmProjectView(View):
     @staticmethod
-    def post(request):
-        project_id = request.POST.get('project_id', None)
+    def post(request, **kwargs):
+
+        project_id = kwargs["pk"]
+        print("id is", project_id)
         project = UserFile.objects.get(id__iexact=project_id)
         print(project.file.name, project.file.url)
         # try catch voorzien hier
@@ -633,3 +629,19 @@ class HelperFunctions:
         project_file = str(textract.process(self.path)).split(".")
         sentence_count = len(project_file)
         return sentence_count
+
+    @staticmethod
+    def calculate_price(*args):
+        price_word = 0.3
+        delta_deadline = args[0]
+        word_count = args[1]
+
+        if delta_deadline < 3:
+            price = word_count * price_word * 1.50
+        elif 3 <= delta_deadline <= 7:
+            price = word_count * price_word * 1.30
+        else:
+            price = word_count * price_word
+
+        return price
+

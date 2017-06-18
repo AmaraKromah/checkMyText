@@ -8,7 +8,6 @@
 <h1> Project</h1>
 
 <ul>
-    <input type="hidden" id="project_id" value="{{userfile.id}}">
     Eigennaar: {{userfile.get_owner_full_name}}<br>
     Bestandsnaam: {{userfile.name}}<br>
     Thema: {{userfile.thema}}<br>
@@ -56,12 +55,11 @@
         var checker = $("#checker_id").text();
         $.ajax({
             type: "POST",
-            url: "{% url 'confirm_project' %}",
+            url: "{% url 'confirm_project' pk=userfile.id %}",
             dataType: "json",
             async: true,
             data: {
-                csrfmiddlewaretoken: '{{csrf_token}}',
-                project_id: parseInt($('#project_id').val())
+                csrfmiddlewaretoken: '{{csrf_token}}'
             }
         }).done(function (json) {
             if (json.result === "no checker") {

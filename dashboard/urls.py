@@ -39,5 +39,5 @@ urlpatterns = [
 
     # __________________________AJAX CALLS___________________________________________
     url(r'^get_files_dates/$', views.getFilesDatesView.as_view(), name='get_files_dates'),
-    url(r'^confirm_project/$', views.confirmProjectView.as_view(), name='confirm_project'),
+    url(r'^confirm_project/(?P<pk>[0-9]+)$', views.confirmProjectView.as_view(), name='confirm_project'),
 ]

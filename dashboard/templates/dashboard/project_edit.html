@@ -1,0 +1,28 @@
+{% extends "dashboard/index.html" %}
+
+{% block title %}Edit project{% endblock %}
+
+{%block content %}
+
+{{test}}
+<h1> Nieuwe projecten </h1>
+<br><br>
+
+
+<form enctype="multipart/form-data" id="user_form" method="post" action=" ">
+    {{bestaat}}
+    {% csrf_token %}
+    {{ files_form.as_p }}
+
+    <input type="submit" name="submit" value="Creëren"/>
+</form>
+
+<br><br>
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
+<p><a href="{% url 'master:base' %}">home</a></p>
+{% endblock %}
+
+
+{% block javascript %}
+<script></script>
+{% endblock %}
