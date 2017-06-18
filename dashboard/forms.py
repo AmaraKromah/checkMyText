@@ -527,7 +527,47 @@ class CreateUserFileForm(forms.ModelForm):
 
 
 class EditUserFileForm(forms.ModelForm):
-    # nog validatieprocess starten
+    file = forms.FileField(label='')
+
     class Meta:
         model = UserFile
         fields = ('name', 'thema', 'file', 'end_date')
+
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if name:
+            if not regex_validation(9, name):
+                raise forms.ValidationError("Naam mag geen speciale tekens of getallen bevatten")
+        else:
+            raise forms.ValidationError("Dit veld is verplicht")
+        return name
+
+    def clean_thema(self):
+        thema = self.cleaned_data.get("thema")
+        if thema:
+            if not regex_validation(9, thema):
+                raise forms.ValidationError("thema mag geen speciale tekens of getallen bevatten")
+        else:
+            raise forms.ValidationError("Dit veld is verplicht")
+        return thema
+
+    def clean_file(self):
+        project_file = self.cleaned_data.get("file")
+
+        if project_file is not None:
+            file_name = project_file.name
+            if not str(file_name).endswith('.docx'):
+                raise forms.ValidationError("Gelieve Word document (.docx) up te loaden")
+        else:
+            raise forms.ValidationError("Gelieve een bestand up te loaden")
+        return project_file
+
+    def clean_end_date(self):
+        end_date = self.cleaned_data.get("end_date")
+        now = timezone.now() + timezone.timedelta(hours=2)
+        min_date = now + timezone.timedelta(days=4)
+
+        if end_date < min_date:
+            raise forms.ValidationError("Dag mag niet voor 4 dagen (" + str(min_date.date()) + " " +
+                                        str(min_date.time()).split(".")[0] + str(") van nu vallen"))
+        return end_date

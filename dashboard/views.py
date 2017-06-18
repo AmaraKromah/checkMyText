@@ -29,8 +29,8 @@ from .forms import (
     UserChangePassword,
     UserEditProfile,
     SetPasswordForm,
-    CreateUserFileForm
-)
+    CreateUserFileForm,
+    EditUserFileForm)
 from .models import User, StudentDetails, CompanyDetails, UserProfile, UserType, UserFile
 
 
@@ -520,7 +520,6 @@ class ProjectCreateView(View):
             upload_date = moment.utcnow().timezone('Europe/Brussels')  # same as today but used for calculations
             checker_end_date = moment.date(end_date)
             delta_deadline = (checker_end_date - upload_date).days
-            price_word = 0.3
             project_file = files_form.cleaned_data.get('file')
 
             if not UserFile.objects.filter(name=name).exists():
@@ -556,7 +555,64 @@ class ProjectCreateView(View):
 
 # nog implementeren
 class ProjectEditView(View):
-    pass
+    @staticmethod
+    def post(request, **kwargs):
+        files_form = EditUserFileForm(data=request.POST, files=request.FILES)
+        project_id = kwargs["pk"]
+        project = UserFile.objects.get(id__iexact=project_id)
+
+        if files_form.is_valid():
+            name = files_form.cleaned_data.get('name')
+            thema = files_form.cleaned_data.get('thema')
+            end_date = files_form.cleaned_data.get('end_date')
+            now = timezone.now()
+            upload_date = moment.utcnow().timezone('Europe/Brussels')  # same as today but used for calculations
+            checker_end_date = moment.date(end_date)
+            delta_deadline = (checker_end_date - upload_date).days
+            project_file = files_form.cleaned_data.get('file')
+
+            # remove the file first
+            project.file.delete()
+            project.save()
+
+            # update all but the word count and price
+            project.name = name
+            project.thema = thema
+            project.upload_date = now
+            project.file = project_file
+            project.end_date = end_date
+            project.save()
+
+            # update the word count and price
+            path = project.file.path
+            helper = HelperFunctions(path)
+            word_count = helper.get_word_count()
+            price = helper.calculate_price(delta_deadline, word_count)
+
+            project.word_count = word_count
+            project.price = price
+            project.save()
+
+            return redirect('dashboard')
+
+        return render(request, 'dashboard/project_edit.html', {'files_form': files_form})
+
+    @staticmethod
+    def get(request, **kwargs):
+        project_id = kwargs["pk"]
+        project = UserFile.objects.get(id__iexact=project_id)
+        project_edit_form = EditUserFileForm(initial={
+            'name': project.name,
+            'thema': project.thema,
+            'file': project.file,
+            'end_date': project.end_date,
+        })
+
+        if request.user.is_authenticated():
+
+            return render(request, 'dashboard/project_edit.html', {'files_form': project_edit_form})
+        else:
+            return redirect('login')
 
 
 class ProjectDeleteView(generic.DeleteView):
@@ -644,4 +700,3 @@ class HelperFunctions:
             price = word_count * price_word
 
         return price
-

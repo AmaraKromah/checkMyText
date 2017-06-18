@@ -60,3 +60,6 @@ ________________________________________________________________________________
         # if now <= end_date < min_date:
         #     print("DAY CAN NOT BE BETWEN TODAY AND FOUR DAYS FROM NOW")
 
+        //                    active_html += '<a href='+"{% url 'project_detail'  %}"+' >details</a><br><br>';
+
+

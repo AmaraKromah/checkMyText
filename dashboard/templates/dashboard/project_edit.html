@@ -14,15 +14,21 @@
     {% csrf_token %}
     {{ files_form.as_p }}
 
-    <input type="submit" name="submit" value="Creëren"/>
+
+    <input type="submit" name="submit" value="Bewerken"/>
 </form>
 
 <br><br>
+<a href="#" onclick="goBack();return false;">Terug</a>
 <p><a href="{% url 'dashboard' %}">dashboard</a></p>
 <p><a href="{% url 'master:base' %}">home</a></p>
 {% endblock %}
 
 
 {% block javascript %}
-<script></script>
+<script>
+      function goBack() {
+        location.replace(document.referrer);
+    }
+</script>
 {% endblock %}

@@ -69,9 +69,8 @@
                     warning_html += "Bestand: " + result.name + "<br>" +
                         "<strong> verloopt: " + upper_first(today.clone().subtract(0, 'd').to(enddate)) +
                         " op " + enddate.format("D/M/YYYY") + " om "+enddate.format("HH:mm:ss")+"</strong><br>";
-//                    warning_html += '<a  onclick="testing('+result.id+')">details</a><br><br>'
-//                    warning_html += '<a href=' + "../projects/" + result.id + ' >details</a><br><br>';
-                      warning_html += '<a href='+"{% url 'all_projects' %}"+result.id+' >details</a><br><br>';
+                    warning_html += '<a href=' + "../project/" + result.id + ' >details</a> ';
+                    warning_html += '<a href=' + "../project/" + result.id + '/edit >edit</a><br><br>';
 
                     $("#warning_project").html(warning_html);
                 } else {
@@ -93,9 +92,11 @@
                     active_html += "Bestand: " + result.name + "<br>" +
                         "Nog lopend tot: <strong>" + enddate.format("D/M/YYYY") + "</strong><br>";
 
-                    active_html += '<a href='+"{% url 'all_projects' %}"+result.id+' >details</a><br><br>';
-//                    active_html += '<a href=' + "../projects/" + result.id + ' >details</a><br><br>';
+                    active_html += '<a href=' + "../project/" + result.id + ' >details</a> ';
+                    active_html += '<a href=' + "../project/" + result.id + '/edit >edit</a><br><br>';
                     $("#active_project").html(active_html);
+                }else {
+                    $("#active_project").html("Geen bestanden");
                 }
 
             });
