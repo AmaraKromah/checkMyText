@@ -7,8 +7,11 @@
 <!--check of dit beter in de view kan -->
 <h1> Alle projecten </h1>
     <ul>
-        {%for project in all_projects %}
+
+        {% for project in all_projects %}
+            <!--GEEN CHECKER-->
             {% if project.checker is None %}
+                <!--TEXTER-->
                 {% if user.userprofile.user_type.name == "texter" %}
                     Eigenaar: {{ project.get_owner_full_name }}<br>
                     Checker: {{ project.get_checker_full_name}}<br>
@@ -21,7 +24,16 @@
                       <input type="submit" value="Verwijderen" />
                     </form>
                     <br>
+                {% else %}
+                    <!--CHECKER-->
+                    Eigenaar: {{ project.get_owner_full_name }}<br>
+                    Checker: {{ project.get_checker_full_name}}<br>
+                    Bestandsnaam:{{ project.name }}<br>
+                    Eind datum: {{project.end_date|date:"l d M Y"}}<br>
+                    Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
+                    <a href="{% url 'all_projects' %}{{project.id}}">details</a><br>
                 {% endif %}
+
             {% else %}
                 {% if user.userprofile.user_type.name == "texter" %}
                     Eigenaar: {{ project.get_owner_full_name }}<br>

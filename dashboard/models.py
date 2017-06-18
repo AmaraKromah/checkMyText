@@ -143,5 +143,6 @@ class UserFile(models.Model):
 
 # om de bestand te verwijderen als het opdracht verwijderd word
 @receiver(pre_delete, sender=UserFile)
-def delete( instance, **kwargs):
+def delete(instance, **kwargs):
+
     instance.file.delete(False)

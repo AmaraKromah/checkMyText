@@ -421,6 +421,7 @@ class ProjectIndexView(generic.ListView):
     context_object_name = "all_projects"
 
     def dispatch(self, request, *args, **kwargs):  # onze request parameter opvangen
+
         if request.user.is_authenticated():
             return super(ProjectIndexView, self).dispatch(request, *args, **kwargs)
         else:
@@ -439,7 +440,6 @@ class ProjectRunningView(generic.ListView):
     template_name = 'dashboard/project_running.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # check if there is some video onsite
         if request.user.is_authenticated():
             if request.user.userprofile.user_type.name == "checker":
                 return super(ProjectRunningView, self).dispatch(request, *args, **kwargs)
@@ -447,7 +447,6 @@ class ProjectRunningView(generic.ListView):
                 return redirect('dashboard')
         else:
             return redirect('login')
-            # raise Http404
 
     def get_queryset(self):
         return UserFile.objects.all()
@@ -507,58 +506,6 @@ class ProjectDetailView(generic.DetailView):
         return context
 
 
-# AJAX CALLS
-class getFilesDatesView(View):
-    @staticmethod
-    def get(request):
-        files = UserFile.objects.filter(checker_id=request.user.id). \
-            values('id', 'checker_id', 'owner_id', 'name', 'end_date')
-
-        users = User.objects.all().values('id', 'last_name', 'first_name')
-        response_data = {}
-        try:
-            response_data['result'] = 'Succes'
-            response_data['dates'] = list(files)
-            response_data['users'] = list(users)
-
-        except (ObjectDoesNotExist, EmptyResultSet):  # errors nog opvangen in ajax
-            response_data['result'] = 'Error'
-            response_data['dates'] = 'No files found '
-            response_data['users'] = 'No users found '
-
-        if request.method == 'GET':
-            if request.is_ajax():
-                return JsonResponse(response_data)
-        else:
-            raise Http404
-
-
-class confirmProjectView(View):
-    @staticmethod
-    def post(request):
-        project_id = request.POST.get('project_id', None)
-        project = UserFile.objects.get(id__iexact=project_id)
-        print(project.file.name, project.file.url)
-        # try catch voorzien hier
-        user_name = request.user.first_name + " " + request.user.last_name
-        response_data = {}
-
-        if project.checker is None:
-            project.checker = request.user
-            project.accept_date = timezone.now()
-            project.save()
-            response_data['result'] = "no checker"
-            response_data['checker'] = user_name
-            response_data['accept_date'] = project.accept_date
-            response_data['file_name'] = project.file.name
-            response_data['file_url'] = project.file.url
-
-        if request.is_ajax():
-            return JsonResponse(response_data)
-        else:
-            raise Http404
-
-
 class ProjectCreateView(View):
     @staticmethod
     def post(request):
@@ -613,6 +560,66 @@ class ProjectCreateView(View):
             return redirect('login')
 
 
+# nog implementeren
+class ProjectEditView(View):
+    pass
+
+
+class ProjectDeleteView(generic.DeleteView):
+    model = UserFile
+    success_url = reverse_lazy('all_projects')
+
+
+# AJAX CALLS
+class getFilesDatesView(View):
+    @staticmethod
+    def get(request):
+        files = UserFile.objects.filter(checker_id=request.user.id). \
+            values('id', 'checker_id', 'owner_id', 'name', 'end_date')
+
+        users = User.objects.all().values('id', 'last_name', 'first_name')
+        response_data = {}
+        try:
+            response_data['result'] = 'Succes'
+            response_data['dates'] = list(files)
+            response_data['users'] = list(users)
+
+        except (ObjectDoesNotExist, EmptyResultSet):  # errors nog opvangen in ajax
+            response_data['result'] = 'Error'
+            response_data['dates'] = 'No files found '
+            response_data['users'] = 'No users found '
+
+        if request.method == 'GET':
+            if request.is_ajax():
+                return JsonResponse(response_data)
+        else:
+            raise Http404
+
+
+class confirmProjectView(View):
+    @staticmethod
+    def post(request):
+        project_id = request.POST.get('project_id', None)
+        project = UserFile.objects.get(id__iexact=project_id)
+        print(project.file.name, project.file.url)
+        # try catch voorzien hier
+        user_name = request.user.first_name + " " + request.user.last_name
+        response_data = {}
+
+        if project.checker is None:
+            project.checker = request.user
+            project.accept_date = timezone.now()
+            project.save()
+            response_data['result'] = "no checker"
+            response_data['checker'] = user_name
+            response_data['accept_date'] = project.accept_date
+
+        if request.is_ajax():
+            return JsonResponse(response_data)
+        else:
+            raise Http404
+
+
 class HelperFunctions:
     def __init__(self, path):
         self.path = path
@@ -626,8 +633,3 @@ class HelperFunctions:
         project_file = str(textract.process(self.path)).split(".")
         sentence_count = len(project_file)
         return sentence_count
-
-
-class ProjectDeleteView(generic.DeleteView):
-    model = UserFile
-    success_url = reverse_lazy('all_projects')

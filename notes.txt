@@ -54,3 +54,9 @@ ________________________________________________________________________________
                 model = UserFile
     success_url = reverse_lazy('all_projects')
 
+
+__________________________________________________________________________________________________________________
+
+        # if now <= end_date < min_date:
+        #     print("DAY CAN NOT BE BETWEN TODAY AND FOUR DAYS FROM NOW")
+
