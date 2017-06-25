@@ -45,9 +45,8 @@
             var active_html = "";
             var today = moment();
             $.each(result_date, function (index, result) {
-
                 var enddate = moment(result.end_date);
-                console.log(enddate);
+//                console.log(enddate);
                 var owner = $.grep(result_user, function (v) {
                     return v.id === result.owner_id;
                 })[0];
@@ -69,12 +68,9 @@
                     warning_html += "Bestand: " + result.name + "<br>" +
                         "<strong> verloopt: " + upper_first(today.clone().subtract(0, 'd').to(enddate)) +
                         " op " + enddate.format("D/M/YYYY") + " om "+enddate.format("HH:mm:ss")+"</strong><br>";
-                    warning_html += '<a href=' + "../project/" + result.id + ' >details</a> ';
-                    warning_html += '<a href=' + "../project/" + result.id + '/edit >edit</a><br><br>';
+                    warning_html += '<a href=' + "../project/" + result.id + ' >details</a><br><br>';
 
                     $("#warning_project").html(warning_html);
-                } else {
-                    $("#warning_project").html("Geen bestanden");
                 }
 
 
@@ -82,7 +78,7 @@
                 if (enddate > (today.clone().add(4, 'd'))) {
 
                     active_html += "Eigennaar: " + owner.first_name + " " + owner.last_name + "<br>";
-                    console.log(typeof(checker));
+//                    console.log(typeof(checker));
                     if (typeof(checker) === 'undefined') {
 
                         active_html += "Checker: None <br>";
@@ -92,18 +88,15 @@
                     active_html += "Bestand: " + result.name + "<br>" +
                         "Nog lopend tot: <strong>" + enddate.format("D/M/YYYY") + "</strong><br>";
 
-                    active_html += '<a href=' + "../project/" + result.id + ' >details</a> ';
-                    active_html += '<a href=' + "../project/" + result.id + '/edit >edit</a><br><br>';
+                    active_html += '<a href=' + "../project/" + result.id + ' >details</a><br><br>';
                     $("#active_project").html(active_html);
-                }else {
-                    $("#active_project").html("Geen bestanden");
                 }
 
             });
 
         }
 
-        setInterval(auto_update, 1000);
+//        setInterval(auto_update, 1000);
     }
     ajax_dates();
 

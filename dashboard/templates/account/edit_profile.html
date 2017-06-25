@@ -1,24 +1,129 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Edit profile</title>
-    </head>
+<head>
+    <title>Edit profile</title>
+</head>
 
-    <body>
-        <h1>Edit profile</h1>
-        CheckMyText says: <strong>edit profile!</strong><br />
+<body>
+<h1>Edit profile</h1>
+CheckMyText says: <strong>edit profile!</strong><br/>
 
-        <form id="user_form" method="post" action=" "
-                enctype="multipart/form-data">
+<form id="profile_edit_form" method="post" action=" "
+      enctype="multipart/form-data">
+    {% csrf_token %}
 
-            {% csrf_token %}
-            {{ profile_edit_form.as_p }}
+    {{ profile_edit_form.non_field_errors }}
+    <div class="fieldWrapper">
+        <p>
+            {{ profile_edit_form.first_name.errors }}
+            <label for="{{ profile_edit_form.first_name.id_for_label }}">First name:</label>
+            {{ profile_edit_form.first_name }}</p>
+        <p>
+            {{ profile_edit_form.last_name.errors }}
+            <label for="{{ profile_edit_form.last_name.id_for_label }}">Last name:</label>
+            {{ profile_edit_form.last_name }}</p>
+        <p>
+            {{ profile_edit_form.username.errors }}
+            <label for="{{ profile_edit_form.username.id_for_label }}">Username:</label>
+            {{ profile_edit_form.username }} </p>
+        <p>
+            {{ profile_edit_form.sex.errors }}
+            <label for="{{ profile_edit_form.sex.id_for_label }}">Sex:</label>
+            {{ profile_edit_form.sex }} </p>
+        <P>
+            {{ profile_edit_form.birth_date.errors }}
+            <label for="{{ profile_edit_form.birth_date.id_for_label }}">Birthday:</label>
+            {{ profile_edit_form.birth_date }} </P>
+        <P>
+            {{ profile_edit_form.hook_up.errors }}
+            <label for="{{ profile_edit_form.hook_up.id_for_label }}">Hook up:</label>
+            {{ profile_edit_form.hook_up }} </P>
+        <P>
+            {{ profile_edit_form.payment.errors }}
+            <label for="{{ profile_edit_form.payment.id_for_label }}">Payment:</label>
+            {{ profile_edit_form.payment }}</P>
+        <P>
+            {{ profile_edit_form.status.errors }}
+            <label for="{{ profile_edit_form.status.id_for_label }}">Status:</label>
+            {{ profile_edit_form.status }}</P>
+    </div>
+    <div id="student_wrapper" class="fieldWrapper">
+        <p>
+            {{ profile_edit_form.school.errors }}
+            <label for="{{ profile_edit_form.school.id_for_label }}">School:</label>
+            {{ profile_edit_form.school }}</p>
+        <p>
+            {{ profile_edit_form.education.errors }}
+            <label for="{{ profile_edit_form.education.id_for_label }}">Education:</label>
+            {{ profile_edit_form.education }}</p>
+    </div>
+    <div id="company_wrapper" class="fieldWrapper">
+        <p>
+            {{ profile_edit_form.business_number.errors }}
+            <label for="{{ profile_edit_form.business_number.id_for_label }}">Business number:</label>
+            {{ profile_edit_form.business_number }}</p>
+        <p>
+            {{ profile_edit_form.sector.errors }}
+            <label for="{{ profile_edit_form.sector.id_for_label }}">Sector:</label>
+            {{ profile_edit_form.sector }}</p>
+        <p>
+            {{ profile_edit_form.preference.errors }}
+            <label for="{{ profile_edit_form.preference.id_for_label }}">Preference:</label>
+            {{ profile_edit_form.preference }}</p>
+    </div>
 
-            <input type="submit" name="submit" value="Bewerk" />
-        </form>
-        <p><a href="{% url 'profile' %}">terug</a></p>
-      <p><a href="{% url 'dashboard' %}">dashboard</a></p>
+    <input type="submit" name="submit" value="Bewerk"/>
+</form>
+<p><a href="{% url 'profile' %}">terug</a></p>
+<p><a href="{% url 'dashboard' %}">dashboard</a></p>
 <p><a href="{% url 'master:base' %}">home</a></p>
 
-    </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+//    deelt hetzelfde jquery als register, probeer deze samen te brengen
+    $(document).ready(function () {
+        var status = $("#id_status");
+        on_load_status();
+        after_load_status();
+
+        function on_load_status() {
+            var status_value = status.find(":selected").text().toLowerCase();
+            if (status_value === "student") {
+
+                $("#company_wrapper").hide();
+                $("#student_wrapper").show();
+            }
+            if (status_value === "bedrijf") {
+
+                $("#student_wrapper").hide();
+                $("#company_wrapper").show();
+            }
+            if (status_value === "algemeen gebruiker") {
+
+                $("#student_wrapper,#company_wrapper").hide();
+            }
+        }
+        function after_load_status() {
+            status.change(function () {
+                var status_value = status.find(":selected").text().toLowerCase();
+                if (status_value === "student") {
+                    $("#company_wrapper").hide();
+                    $("#student_wrapper").show();
+                }
+                if (status_value === "bedrijf") {
+
+                    $("#student_wrapper").hide();
+                    $("#company_wrapper").show();
+                }
+                if (status_value === "algemeen gebruiker") {
+                    $("#student_wrapper,#company_wrapper").hide();
+
+                }
+            });
+        }
+    });
+
+
+</script>
+</body>
 </html>

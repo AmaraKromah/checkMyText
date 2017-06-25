@@ -31,7 +31,7 @@ from .forms import (
     SetPasswordForm,
     CreateUserFileForm,
     EditUserFileForm)
-from .models import User, StudentDetails, CompanyDetails, UserProfile, UserType, UserFile
+from .models import User, StudentDetails, CompanyDetails, UserProfile, UserType, UserFile, Rating
 
 
 # ---------------hierboven is niet van mij----------------------------
@@ -333,6 +333,7 @@ class ProfileEditView(View):
     def get(request):
 
         if request.user.userprofile.status == "student":
+            print("BD", request.user.userprofile.birth_date)
             profile_edit_form = UserEditProfile(initial={
                 'first_name': request.user.first_name,
                 'last_name': request.user.last_name,
@@ -502,7 +503,12 @@ class ProjectDetailView(generic.DetailView):
                     whole_word += word + "."
             sample_count += 1
         context['sample'] = whole_word
-
+        try:
+            rating = Rating.objects.get(user_file=project)
+            context['rating'] = str(rating.stars).replace(",", ".")
+        except ObjectDoesNotExist:
+            context['rating'] = None
+        # print("user file:", rating.user_file, "\nimproved file:", rating.user_file.improved_file)
         return context
 
 
@@ -534,26 +540,26 @@ class ProjectCreateView(View):
                 project.price = price
                 project.save()
                 return redirect('dashboard')
-            # vervang dit later door ajax
-            return render(request, 'dashboard/project_new.html', {'files_form': files_form,
-                                                                  'bestaat': 'deze opdracht bestaat al reeds',
-                                                                  })
+            else:
+                # vervang dit later door ajax
+                return render(request, 'dashboard/project_new.html', {'files_form': files_form,
+                                                                      'bestaat': 'deze opdracht bestaat al reeds',
+                                                                      })
 
         return render(request, 'dashboard/project_new.html', {'files_form': files_form})
 
     @staticmethod
     def get(request):
         if request.user.is_authenticated():
-            # if request.user.userprofile.user_type.name == "texter":
-            files_form = CreateUserFileForm()
-            return render(request, 'dashboard/project_new.html', {'files_form': files_form})
-            # else:
-            #     return redirect('dashboard')
+            if request.user.userprofile.user_type.name == "texter":
+                files_form = CreateUserFileForm()
+                return render(request, 'dashboard/project_new.html', {'files_form': files_form})
+            else:
+                return redirect('dashboard')
         else:
             return redirect('login')
 
 
-# nog implementeren
 class ProjectEditView(View):
     @staticmethod
     def post(request, **kwargs):
@@ -665,6 +671,32 @@ class confirmProjectView(View):
             response_data['result'] = "no checker"
             response_data['checker'] = user_name
             response_data['accept_date'] = project.accept_date
+
+        if request.is_ajax():
+            return JsonResponse(response_data)
+        else:
+            raise Http404
+
+
+# overweeg dit een normale view van te maken in plaats van een Ajax
+class RatingView(View):
+    @staticmethod
+    def post(request):
+        project_id = request.POST.get("project_id", "None")
+        rating = request.POST.get("rating", "None")
+        project = UserFile.objects.get(id__iexact=project_id)
+        response_data = {}
+
+        if Rating.objects.filter(user_file=project).exists():
+            project_rating = Rating.objects.get(user_file=project)
+            project_rating.stars = rating
+            project_rating.save()
+            response_data['result'] = "succes"
+            response_data['stars'] = project_rating.stars
+        else:
+            project_rating = Rating.objects.create(user_file=project, stars=rating)
+            response_data['result'] = "succes"
+            response_data['stars'] = project_rating.stars
 
         if request.is_ajax():
             return JsonResponse(response_data)

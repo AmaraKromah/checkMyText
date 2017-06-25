@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, StudentDetails, CompanyDetails, UserType, UserFile
+from .models import UserProfile, StudentDetails, CompanyDetails, UserType, UserFile, Rating
 
 
 # Register your models here.
@@ -26,3 +26,4 @@ admin.site.register(StudentDetails)
 admin.site.register(CompanyDetails)
 admin.site.register(UserType)
 admin.site.register(UserFile)
+admin.site.register(Rating)

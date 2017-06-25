@@ -194,17 +194,18 @@ class UserProfileForm(forms.Form):
         if password:
             if not regex_validation(1, password):
                 raise forms.ValidationError("Wachtwoord is te kort")
-                # if not regex_validation(2, password):
-                #     raise forms.ValidationError("Wachtwoord moet een hoofdletter bevatten")
-                #
-                # if not regex_validation(3, password):
-                #     raise forms.ValidationError("Wachtwoord moet een getal bevatten")
-                #
-                # if not regex_validation(4, password):
-                #     raise forms.ValidationError("Wachtwoord moet een speciale karakter bevatten")
-                #
-                # if regex_validation(5, password):
-                #     raise forms.ValidationError("Wachtwoord mag geen spaties bevatten")
+
+            # if not regex_validation(2, password):
+            #     raise forms.ValidationError("Wachtwoord moet een hoofdletter bevatten")
+            #
+            # if not regex_validation(3, password):
+            #     raise forms.ValidationError("Wachtwoord moet een getal bevatten")
+            #
+            # if not regex_validation(4, password):
+            #     raise forms.ValidationError("Wachtwoord moet een speciale karakter bevatten")
+            #
+            # if regex_validation(5, password):
+            #     raise forms.ValidationError("Wachtwoord mag geen spaties bevatten")
         else:
             raise forms.ValidationError("Dit veld is verplicht")
         return password
@@ -317,17 +318,17 @@ class UserChangePassword(forms.Form):
                 if not regex_validation(1, new_password):
                     raise forms.ValidationError("Wachtwoord is te kort")
 
-                    # if not regex_validation(2, new_password):
-                    #     raise forms.ValidationError("Wachtwoord moet een hoofdletter bevatten")
-                    #
-                    # if not regex_validation(3, new_password):
-                    #     raise forms.ValidationError("Wachtwoord moet een getal bevatten")
-                    #
-                    # if not regex_validation(4, new_password):
-                    #     raise forms.ValidationError("Wachtwoord moet een speciale karakter bevatten")
-                    #
-                    # if regex_validation(5, new_password):
-                    #     raise forms.ValidationError("Wachtwoord mag geen spaties bevatten")
+                # if not regex_validation(2, new_password):
+                #     raise forms.ValidationError("Wachtwoord moet een hoofdletter bevatten")
+                #
+                # if not regex_validation(3, new_password):
+                #     raise forms.ValidationError("Wachtwoord moet een getal bevatten")
+                #
+                # if not regex_validation(4, new_password):
+                #     raise forms.ValidationError("Wachtwoord moet een speciale karakter bevatten")
+                #
+                # if regex_validation(5, new_password):
+                #     raise forms.ValidationError("Wachtwoord mag geen spaties bevatten")
         else:
             raise forms.ValidationError("Dit veld is verplicht")
 
@@ -386,7 +387,7 @@ class UserEditProfile(forms.Form):
     last_name = forms.CharField(required=False)
     username = forms.CharField(required=False, widget=forms.TextInput(attrs={'size': 15, 'maxlength': 15}))
     sex = forms.CharField(widget=forms.Select(choices=SEX_CHOICES), required=False)
-    birth_date = forms.DateField(input_formats=settings.DATE_INPUT_FORMATS, required=False)
+    birth_date = forms.DateField(required=False)
     hook_up = forms.CharField(widget=forms.Select(choices=HOOK_UP_CHOICES), required=False)
     payment = forms.CharField(widget=forms.Select(choices=PAYMENT_CHOICES), required=False)
     status = forms.CharField(widget=forms.Select(choices=STATUS_CHOICES), required=False)
@@ -518,7 +519,7 @@ class CreateUserFileForm(forms.ModelForm):
     def clean_end_date(self):
         end_date = self.cleaned_data.get("end_date")
         now = timezone.now() + timezone.timedelta(hours=2)
-        min_date = now + timezone.timedelta(days=4)
+        min_date = now + timezone.timedelta(days=3)
 
         if end_date < min_date:
             raise forms.ValidationError("Dag mag niet voor 4 dagen (" + str(min_date.date()) + " " +

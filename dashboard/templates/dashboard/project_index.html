@@ -22,7 +22,7 @@
                      <a href="{% url 'edit_project' pk=project.id  %}"> edit</a><br>
                     <form action="{% url 'delete_project' pk=project.id %}" method="post">
                         {% csrf_token %}
-                      <input type="submit" value="Verwijderen" />
+                      <input type="submit" value="Verwijderen" /><br>
                     </form>
                     <br>
                 {% else %}
@@ -32,8 +32,7 @@
                     Bestandsnaam:{{ project.name }}<br>
                     Eind datum: {{project.end_date|date:"l d M Y"}}<br>
                     Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
-                    <a href="{% url 'project_detail' pk=project.id  %}">details</a>
-                    <a href="{% url 'edit_project' pk=project.id  %}"> edit</a><br>
+                    <a href="{% url 'project_detail' pk=project.id  %}">details</a><br>
                 {% endif %}
 
             {% else %}
@@ -43,8 +42,8 @@
                     Bestandsnaam:{{ project.name }}<br>
                     Eind datum: {{project.end_date|date:"l d M Y"}}<br>
                     Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
-                    <a href="{% url 'project_detail' pk=project.id  %}">details</a>
-                    <a href="{% url 'edit_project' pk=project.id  %}"> edit</a><br>
+                    <a href="{% url 'project_detail' pk=project.id  %}">details</a><br>
+
                     Kan niet verwijderd worden.<br>
                 {% else %}
                     Eigenaar: {{ project.get_owner_full_name }}<br>
@@ -52,8 +51,8 @@
                     Bestandsnaam:{{ project.name }}<br>
                     Eind datum: {{project.end_date|date:"l d M Y"}}<br>
                     Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
-                    <a href="{% url 'project_detail' pk=project.id  %}">details</a>
-                    <a href="{% url 'edit_project' pk=project.id  %}"> edit</a><br>
+                    <a href="{% url 'project_detail' pk=project.id  %}">details</a><br>
+
                 {% endif %}
             {% endif %}
             <br>

@@ -14,7 +14,6 @@
             Eind datum: {{project.end_date|date:"l d M Y"}}<br>
             Eind tijd: {{project.end_date|date:"H:i:s"}}<br>
             <a href="{% url 'project_detail' pk=project.id  %}">details</a>
-            <a href="{% url 'edit_project' pk=project.id  %}"> edit</a><br>
             <br><br>
 
         {% endfor %}

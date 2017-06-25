@@ -34,8 +34,11 @@ urlpatterns = [
     url(r'^project/(?P<pk>[0-9]+)/edit', views.ProjectEditView.as_view(), name='edit_project'),
     url(r'^project/(?P<pk>[0-9]+)/delete$', views.ProjectDeleteView.as_view(), name='delete_project'),
 
-    # __________________________________________________________________________________________________________
+    # _________________________________RATING____________________________________
+    url(r'^rating/$', views.RatingView.as_view(), name='rate_project'),
 
+
+    # __________________________________________________________________________________________________________
 
     # __________________________AJAX CALLS___________________________________________
     url(r'^get_files_dates/$', views.getFilesDatesView.as_view(), name='get_files_dates'),

@@ -58,10 +58,6 @@ class UserProfile(models.Model):
         ('bitcoint', 'Bitcoint'),
     )
 
-    PREFERENCE_CHOICES = (
-        ('eenmalig opdracht', 'Eenmalig opdracht'),
-        ('langdurige opdracht', 'langdurige opdracht'),
-    )
     user = models.OneToOneField(User)
     user_type = models.ForeignKey(UserType, on_delete=models.CASCADE)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, blank=True)
@@ -109,7 +105,7 @@ class CompanyDetails(models.Model):
         return str(self.user.username) + ' preference ' + str(self.preference)
 
 
-# END USER PROFILE
+# USERFILE
 
 class UserFile(models.Model):
     owner = models.ForeignKey(User, related_name="user_texter", on_delete=models.CASCADE)
@@ -122,6 +118,7 @@ class UserFile(models.Model):
     checker = models.ForeignKey(User, related_name="user_checker", on_delete=models.SET_NULL, null=True, blank=True)
     price = models.FloatField(blank=True, null=True)
     file = models.FileField(blank=True)
+    improved_file = models.FileField(blank=True, null=True)
 
     def get_owner_full_name(self):
         return self.owner.first_name + " " + self.owner.last_name
@@ -144,5 +141,21 @@ class UserFile(models.Model):
 # om de bestand te verwijderen als het opdracht verwijderd word
 @receiver(pre_delete, sender=UserFile)
 def delete(instance, **kwargs):
-
+    print(kwargs)
     instance.file.delete(False)
+
+
+class Rating(models.Model):
+    user_file = models.ForeignKey(UserFile, on_delete=models.CASCADE, null=True)
+    stars = models.FloatField()
+
+    "aanpassen naar enkel verbeterde docs"
+    def __str__(self):
+        if self.user_file.checker is None:
+            return "owner: " + str(self.user_file.owner.first_name) + ' name: ' + str(self.user_file.name) + \
+                   ' checker: None '+ "starts: " + str(self.stars)
+        else:
+            return "owner: " + str(self.user_file.owner.first_name) + ' name: ' + str(
+                self.user_file.name) + ' checker: ' + str(
+                self.user_file.checker.first_name) + "starts: " + str(self.stars)
+
