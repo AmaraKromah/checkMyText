@@ -157,7 +157,6 @@ class RegisterFormView(View):
                     user_type = UserType.objects.get(name="texter")
                 except ObjectDoesNotExist:
                     UserType.create(name="texter")
-                    print("oei", user_type)
                     user_type = UserType.objects.get(name="texter")
 
             elif session == "checker":
@@ -333,7 +332,6 @@ class ProfileEditView(View):
     def get(request):
 
         if request.user.userprofile.status == "student":
-            print("BD", request.user.userprofile.birth_date)
             profile_edit_form = UserEditProfile(initial={
                 'first_name': request.user.first_name,
                 'last_name': request.user.last_name,
@@ -508,7 +506,6 @@ class ProjectDetailView(generic.DetailView):
             context['rating'] = str(rating.stars).replace(",", ".")
         except ObjectDoesNotExist:
             context['rating'] = None
-        # print("user file:", rating.user_file, "\nimproved file:", rating.user_file.improved_file)
         return context
 
 
@@ -657,9 +654,7 @@ class confirmProjectView(View):
     def post(request, **kwargs):
 
         project_id = kwargs["pk"]
-        print("id is", project_id)
         project = UserFile.objects.get(id__iexact=project_id)
-        print(project.file.name, project.file.url)
         # try catch voorzien hier
         user_name = request.user.first_name + " " + request.user.last_name
         response_data = {}
@@ -671,6 +666,10 @@ class confirmProjectView(View):
             response_data['result'] = "no checker"
             response_data['checker'] = user_name
             response_data['accept_date'] = project.accept_date
+            if project.improved_file:
+                response_data['improved'] = project.improved_file.url
+            else:
+                response_data['improved'] = "None"
 
         if request.is_ajax():
             return JsonResponse(response_data)
@@ -678,7 +677,7 @@ class confirmProjectView(View):
             raise Http404
 
 
-# overweeg dit een normale view van te maken in plaats van een Ajax
+# nog checken op improved file
 class RatingView(View):
     @staticmethod
     def post(request):
@@ -686,17 +685,31 @@ class RatingView(View):
         rating = request.POST.get("rating", "None")
         project = UserFile.objects.get(id__iexact=project_id)
         response_data = {}
+        error = ""
 
-        if Rating.objects.filter(user_file=project).exists():
-            project_rating = Rating.objects.get(user_file=project)
-            project_rating.stars = rating
-            project_rating.save()
-            response_data['result'] = "succes"
-            response_data['stars'] = project_rating.stars
+        if rating is not None and rating != "":
+            if float(rating) < 0:
+                error = "Rating moet hoger of gelijk zijn aan 0"
+
+            if float(rating) > 5:
+                error = "Rating moet lager of gelijk zijn aan 5"
         else:
-            project_rating = Rating.objects.create(user_file=project, stars=rating)
-            response_data['result'] = "succes"
-            response_data['stars'] = project_rating.stars
+            error = "Dit veld is verplicht"
+
+        if not error:
+            if Rating.objects.filter(user_file=project).exists():
+                project_rating = Rating.objects.get(user_file=project)
+                project_rating.stars = rating
+                project_rating.save()
+                response_data['result'] = "succes"
+                response_data['stars'] = project_rating.stars
+            else:
+                project_rating = Rating.objects.create(user_file=project, stars=rating)
+                response_data['result'] = "succes"
+                response_data['stars'] = project_rating.stars
+        else:
+            response_data['result'] = "error"
+            response_data['message'] = error
 
         if request.is_ajax():
             return JsonResponse(response_data)

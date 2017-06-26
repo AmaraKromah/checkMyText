@@ -5,7 +5,7 @@
 {%block content %}
 
 
-<h1> Project</h1>
+<h1> Project:  {{userfile.name}}</h1>
 
 <ul>
     Eigennaar: {{userfile.get_owner_full_name}}<br>
@@ -18,20 +18,33 @@
     Eind datum: {{userfile.end_date|date:"l d M Y"}}<br>
     Eind tijd: {{userfile.end_date|date:"H:i:s"}}<br><br>
     Prijs: {{userfile.price}}<br>
+
     {%if userfile.owner.id is request.user.id %}
         <!--<p>you're the owner</p>-->
-           File: <a href="{{userfile.file.url}}">{{userfile.file}}</a><br>
+           <p>Bestand: <a href="{{userfile.file.url}}" download>{{userfile.file}}</a></p>
+        {% if userfile.improved_file %}
+            <p>Improved file </p>
+        {% else %}
+           <p>No improved file </p>
+        {% endif %}
     {% else %}
          <!--<p>you are not the owner</p>-->
             {%if userfile.checker %}
-                File: <a href="{{userfile.file.url}}">{{userfile.file}}</a><br>
-            {% else %}
+                <p>Bestand: <a href="{{userfile.file.url}}" download>{{userfile.file}}</a></p>
+                    {% if userfile.improved_file %}
+                        <p>Vebertering: <a href="{{userfile.improved_file.url}}" download>{{userfile.improved_file}}</a><br></p>
+                    {% else %}
+                       <p>Project is nog niet verbeterd </p>
+                    {% endif %}
+                {% else %}
                 <span id="project_sample">sample:{{sample|linebreaks}}<br></span>
             {% endif  %}
     {% endif  %}
+
     <span id="project_file"></span>
-    <p id="temp_ratingholder"> </p>
+    <span id="project_improved_file"></span>
     <p> Checker: <span id="checker_id">{{userfile.get_checker_full_name}}</span></p>
+
     {% if request.user.userprofile.user_type.name == "checker" %}
         {% if not userfile.checker %}
             <form onsubmit="return false">
@@ -40,21 +53,27 @@
             </form>
 
         {% else %}
-        <form onsubmit="return false">
-        {% csrf_token %}
-            <!--dit nog opvangen door forms inputfield-->
-            <label for="rating">Ik geef de verbetering een: </label>
-            <input type="number" id="rating" step="0.5" min="0" max="5" /> op 5 <br>
-            <button id="rate" onclick="ConfirmRating()">Beoordeel</button>
-        </form>
+            {% if userfile.improved_file %}
+                <form onsubmit="return false">
+                {% csrf_token %}
+                    <!--dit nog opvangen door forms inputfield-->
+                    <p id="error_rating"></p>
+                    <label for="rating">Ik geef de verbetering een: </label>
+                    <input type="number" id="rating" min="0" max="5" step="0.5" /> op 5 <br>
+                    <button id="rate" onclick="ConfirmRating()">Beoordeel</button>
+                </form>
+            {% endif %}
         {% endif %}
      {% endif %}
 
     {% if rating %}
-         <p id="exist_rating">Huidige beoordeling: {{rating}}/5</p>
+        {% if userfile.improved_file %}
+            <p id="exist_rating">Huidige beoordeling: {{rating}}/5</p>
+        {% endif %}
     {% else %}
-    <p id="no_exist_rating"> Nog niet beoordeeld  </p>
-
+        {% if userfile.improved_file %}
+            <p id="no_exist_rating"> Nog niet beoordeeld  </p>
+        {% endif %}
     {% endif %}
 
 
@@ -72,6 +91,12 @@
     function goBack() {
         location.replace(document.referrer);
     }
+    function remove_unwanted_tags() {
+        if ("{{userfile.checker}}".toString() !== "None"){
+            $("#project_file").remove();
+            $("#project_improved_file").remove();
+        }
+    }
     function ConfirmProject() {
         var checker = $("#checker_id").text();
         $.ajax({
@@ -88,20 +113,21 @@
                 var accept_date = moment(json.accept_date).format("D MMMM YYYY HH:mm:ss");
                 $("#accept_date").text(accept_date);
                 $("#confirm").remove();
-//                    console.log(json.file_name, json.file_url);
-                $("#project_file").html(' File: <a href="{{userfile.file.url}}">{{userfile.file}}</a><br>');
+                $("#project_file").html('<p>Bestand: <a href="{{userfile.file.url}}" download>{{userfile.file}}</a></p>');
 
-//                $("#temp_ratingholder").html('<form onsubmit="return false">');
+//                Verbetering
+                if(json.improved ==="None"){
+                    console.log("Ik kom hier");
+                    $("#project_improved_file").html("<p>Project is nog niet verbeterd</p>")
+                }else{
+                    $("#project_improved_file").html(' Verbetering: <a href="'+json.improved+'" download>' +
+                    '{{userfile.improved_file}}</a><br>');
+                }
+
                 $("#project_sample").remove();
                 }
         });
     }
-    function remove_unwanted_tags() {
-        if ("{{userfile.checker}}".toString() !== "None"){
-            $("#project_file").remove();
-        }
-    }
-
 //    vraag of ik dit best als Ajax doet in de view
     function ConfirmRating() {
         var rating = $("#rating").val();
@@ -119,11 +145,16 @@
                if (json.result === "succes") {
                 if("{{rating}}".toString() ==="None"){
                      $("#no_exist_rating").text("Nieuwe beoordeling: "+json.stars +"/5");
+                     $("#error_rating").fadeOut("slow");
                 }
                 else{
                     $("#exist_rating").text("Nieuwe beoordeling: "+json.stars +"/5");
-                    $("#no_exist_rating").remove()
+                    $("#no_exist_rating").remove();
+                     $("#error_rating").fadeOut("slow");
                 }
+               }
+               if (json.result === "error") {
+                   $("#error_rating").fadeIn("slow").text(json.message);
                }
         });
     }

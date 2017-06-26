@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^project/(?P<pk>[0-9]+)/delete$', views.ProjectDeleteView.as_view(), name='delete_project'),
 
     # _________________________________RATING____________________________________
-    url(r'^rating/$', views.RatingView.as_view(), name='rate_project'),
+
 
 
     # __________________________________________________________________________________________________________
@@ -43,4 +43,5 @@ urlpatterns = [
     # __________________________AJAX CALLS___________________________________________
     url(r'^get_files_dates/$', views.getFilesDatesView.as_view(), name='get_files_dates'),
     url(r'^confirm_project/(?P<pk>[0-9]+)$', views.confirmProjectView.as_view(), name='confirm_project'),
+    url(r'^rating/$', views.RatingView.as_view(), name='rate_project'),
 ]
