@@ -237,7 +237,20 @@ class ProfileView(View):
 
         if request.user.is_authenticated():
             user = User.objects.get(id=request.user.id)
-            return render(request, 'account/profile.html', {'user': user})
+            all_rating = Rating.objects.filter(user_file__checker=user)
+            sum_ = 0
+            total = len(all_rating)
+
+            if all_rating.exists():
+                for rat in all_rating:
+                    sum_ += rat.stars
+                rating = sum_ / total
+
+            else:
+                rating = None
+
+            return render(request, 'account/profile.html', {'user': user,
+                                                            'rating': rating, "totaal": total})
         else:
             return redirect('login')
 
@@ -677,7 +690,6 @@ class confirmProjectView(View):
             raise Http404
 
 
-# nog checken op improved file
 class RatingView(View):
     @staticmethod
     def post(request):

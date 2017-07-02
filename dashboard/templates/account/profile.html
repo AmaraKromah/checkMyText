@@ -18,6 +18,12 @@
     <p> ondernemingsnummer: {{user.companydetails.business_number}}</p>
     <p> sector: {{user.companydetails.sector}}</p>
     <p> voorkeur: {{user.companydetails.preference}}</p>
+    {% if rating %}
+        <p> Beoordeling: {{rating}}/5 (totaal {{totaal}} bestanden verbeterd)</p>
+    {% else %}
+        <p>Beoordeling: Nog geen bestanden beoordeeld</p>
+    {% endif %}
+
 {%endif%}
 
 <p><a href="{% url 'edit_profile' %}">bewerk uw gegevens</a></p>
